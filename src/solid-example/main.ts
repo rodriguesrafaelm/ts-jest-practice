@@ -1,0 +1,22 @@
+import { EnterpriseCustumer } from './classes/customer';
+// import { IndividualCustomer } from './classes/customer';
+import { Persistence } from './services/persistence';
+import { Messaging } from './services/messaging';
+import { Order } from './classes/order';
+import { ShoppingCart } from './classes/shopping-cart';
+import { Product } from './classes/product';
+import { FiftyPercentDiscount } from './classes/discount';
+
+const shoppingCart = new ShoppingCart(new FiftyPercentDiscount());
+const messaging = new Messaging();
+const persistence = new Persistence();
+// const customer = new IndividualCustomer('Rafael', 'Rodrigues', '12312314');
+const empresa = new EnterpriseCustumer('Bananas do Peu', '12312391839018');
+const order = new Order(shoppingCart, messaging, persistence, empresa);
+shoppingCart.addItem(new Product('Camisa', 50.9));
+shoppingCart.addItem(new Product('Bermuda', 35.0));
+shoppingCart.addItem(new Product('Calça', 42.5));
+console.log(shoppingCart.items);
+console.log(shoppingCart.totalWithDiscount());
+order.checkOut();
+console.log(order.orderStatus);
