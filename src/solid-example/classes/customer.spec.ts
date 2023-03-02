@@ -16,6 +16,7 @@ const createEnterpriseCustomer = (
 };
 
 describe('Individual customer', () => {
+  afterEach(() => jest.clearAllMocks());
   const fakeIndividual = {
     name: 'Gabriel',
     lastName: 'Da Silva',
@@ -41,6 +42,7 @@ describe('Individual customer', () => {
 });
 
 describe('Enterprise customer', () => {
+  afterEach(() => jest.clearAllMocks());
   const fakeEnterprise = {
     name: 'Empresa Grande',
     cnpj: '123465789',

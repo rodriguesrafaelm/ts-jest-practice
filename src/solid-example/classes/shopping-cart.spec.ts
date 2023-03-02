@@ -32,6 +32,7 @@ const createCartItem = (name: string, price: number) => {
 };
 
 describe('testing shopping cart', () => {
+  afterEach(() => jest.clearAllMocks());
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   it('should be empty', () => {
     const { sut } = createSut();
@@ -46,5 +47,20 @@ describe('testing shopping cart', () => {
   it('should test total and totalWithDiscount', () => {
     const { sut } = createSutWithProducts();
     expect(sut.total()).toBe(120.5);
+    expect(sut.totalWithDiscount()).toBe(120.5);
+  });
+
+  it('should remove one item', () => {
+    const { sut } = createSutWithProducts();
+    sut.removeItem(1);
+    expect(sut.items.length).toBe(1);
+    sut.removeItem(0);
+    expect(sut.items.length).toBe(0);
+  });
+
+  it('should add products then clear cart', () => {
+    const { sut } = createSutWithProducts();
+    sut.clear();
+    expect(sut.items.length).toBe(0);
   });
 });
