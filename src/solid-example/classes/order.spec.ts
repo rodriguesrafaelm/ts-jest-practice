@@ -10,7 +10,7 @@ class ShoppingCartMock implements ShoppingCartProtocol {
     return [];
   }
   addItem(item: CartItem): void {
-    throw new Error('Method not implemented.');
+    ///
   }
   removeItem(index: number): void {
     {
@@ -18,37 +18,37 @@ class ShoppingCartMock implements ShoppingCartProtocol {
     }
   }
   isEmpty(): boolean {
-    throw new Error('Method not implemented.');
+    return false;
   }
   total(): number {
-    throw new Error('Method not implemented.');
+    return 1;
   }
   totalWithDiscount(): number {
-    throw new Error('Method not implemented.');
+    return 1;
   }
   clear(): void {
-    throw new Error('Method not implemented.');
+    ///
   }
 }
 
 class MessagingMock implements MessagingProtocol {
   sendMessage(msg: string): void {
-    throw new Error('Method not implemented.');
+    console.log(msg);
   }
 }
 
 class PersistenceMock implements PersistenceProtocol {
   saveOrder(): void {
-    throw new Error('Method not implemented.');
+    ///
   }
 }
 
 class CustomerMock implements CustomerOrder {
   getName(): string {
-    throw new Error('Method not implemented.');
+    return 'string';
   }
   getIDN(): string {
-    throw new Error('Method not implemented.');
+    return 'string';
   }
 }
 
@@ -57,9 +57,59 @@ const createSUT = () => {
   const messagingMock = new MessagingMock();
   const persistenceMock = new PersistenceMock();
   const customerMock = new CustomerMock();
+  const sut = new Order(
+    shoppingCartMock,
+    messagingMock,
+    persistenceMock,
+    customerMock,
+  );
+
+  return {
+    sut,
+    shoppingCartMock,
+    messagingMock,
+    persistenceMock,
+  };
 };
 
 describe('test order', () => {
   afterEach(() => jest.clearAllMocks());
-  it('should not checkout if cart is empty');
+  it('should not checkout if cart is empty', () => {
+    const { sut, shoppingCartMock } = createSUT();
+    const shoppingCartMockSpy = jest
+      .spyOn(shoppingCartMock, 'isEmpty')
+      .mockReturnValueOnce(true);
+    sut.checkOut();
+    expect(shoppingCartMockSpy).toHaveBeenCalledTimes(1);
+    expect(sut.orderStatus).toBe('open');
+  });
+
+  it('should checkout if cart is not empty', () => {
+    const { sut, shoppingCartMock } = createSUT();
+    const shoppingCartMockSpy = jest
+      .spyOn(shoppingCartMock, 'isEmpty')
+      .mockReturnValueOnce(false);
+    sut.checkOut();
+    expect(shoppingCartMockSpy).toHaveBeenCalledTimes(1);
+    expect(sut.orderStatus).toBe('closed');
+  });
+
+  it('should send an email to customer', () => {
+    const { sut, messagingMock } = createSUT();
+    const messagingMockSpy = jest.spyOn(messagingMock, 'sendMessage');
+    sut.checkOut();
+    expect(messagingMockSpy).toHaveBeenCalledTimes(1);
+    expect(messagingMockSpy).toBeCalledWith(
+      'Seu pedido foi recebido com o total de R$ 1',
+    );
+    expect(sut.orderStatus).toBe('closed');
+  });
+
+  it('should save order', () => {
+    const { sut, persistenceMock } = createSUT();
+    const persistenceMockSpy = jest.spyOn(persistenceMock, 'saveOrder');
+    sut.checkOut();
+    expect(persistenceMockSpy).toHaveBeenCalledTimes(1);
+    expect(sut.orderStatus).toBe('closed');
+  });
 });
