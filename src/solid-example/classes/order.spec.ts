@@ -99,7 +99,7 @@ describe('test order', () => {
     const messagingMockSpy = jest.spyOn(messagingMock, 'sendMessage');
     sut.checkOut();
     expect(messagingMockSpy).toHaveBeenCalledTimes(1);
-    expect(messagingMockSpy).toBeCalledWith(
+    expect(messagingMockSpy).toHaveBeenCalledWith(
       'Seu pedido foi recebido com o total de R$ 1',
     );
     expect(sut.orderStatus).toBe('closed');
@@ -111,5 +111,12 @@ describe('test order', () => {
     sut.checkOut();
     expect(persistenceMockSpy).toHaveBeenCalledTimes(1);
     expect(sut.orderStatus).toBe('closed');
+  });
+
+  it('should clear cart', () => {
+    const { sut, shoppingCartMock } = createSUT();
+    const shoppingCartMockSpy = jest.spyOn(shoppingCartMock, 'clear');
+    sut.checkOut();
+    expect(shoppingCartMockSpy).toHaveBeenCalledTimes(1);
   });
 });
